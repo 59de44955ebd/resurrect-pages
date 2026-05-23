@@ -24,6 +24,8 @@ Hit back and try another one!
 
 # Changelog
 
+ * Version 10 (May 23, 2026)
+   * Make extension compatible with Chrome and Edge
  * Version 9 (May 9, 2026)
    * Remove broken providers (Google, MementoWeb).
    * Handle `file://` and reader URLs. (#52)

@@ -22,13 +22,15 @@ chrome.storage.local.get('openIn', item => {
       ['archive.is', 'archiveis', 'archiveis'],
       ['WebCite', 'webcitation', 'webcitation'],
     ]) {
-      chrome.contextMenus.create({
+      const props = {
         contexts: [context],
-        icons: {16: 'icons/cacheicons/' + icon + '.png'},
         id: 'resurrect-' + id + '-' + context,
         parentId: 'resurrect-' + context,
         title: name,
-      }, logLastError);
+      };
+      if (typeof browser !== "undefined") // Firefox
+        props.icons = {16: 'icons/cacheicons/' + icon + '.png'};
+      chrome.contextMenus.create(props, logLastError);
     }
 
     chrome.contextMenus.create({
