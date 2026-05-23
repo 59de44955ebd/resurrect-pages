@@ -1,3 +1,10 @@
+This is a fork of simple, previously Firefox-only browser extension 
+[Resurrect Pages](https://github.com/arantius/resurrect-pages) 
+that makes it compatible with Google Chrome and Microsoft Edge.
+
+The main purpose of this extension is to quickly (2 mouse clicks) free 
+news articles etc. that are hidden behind paywalls, by finding an archived version on [archive.is](https://archive.is).
+
 # Documentation
 
 Dead pages, broken links, the scourge of the internet.
