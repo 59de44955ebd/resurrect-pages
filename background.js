@@ -1,4 +1,91 @@
+const openInEnum = {
+	CURRENT_TAB : 0,
+	NEW_TAB     : 1,
+	NEW_BGTAB   : 2,
+	NEW_WINDOW  : 3,
+}
+
+let openIn = openInEnum.CURRENT_TAB;
+
+function setOpenIn(where) {
+  openIn = where;
+  chrome.storage.local.set({openIn: openIn}, logLastError);
+  updateContextRadios();
+}
+
+function updateContextRadios() {
+  ['page', 'link'].forEach(context => {
+    chrome.contextMenus.update(
+        'resurrect-current-tab-' + context,
+        {checked: openIn == openInEnum.CURRENT_TAB});
+    chrome.contextMenus.update(
+        'resurrect-new-tab-' + context,
+        {checked: openIn == openInEnum.NEW_TAB});
+    chrome.contextMenus.update(
+        'resurrect-bg-tab-' + context,
+        {checked: openIn == openInEnum.NEW_BGTAB});
+    chrome.contextMenus.update(
+        'resurrect-new-window-' + context,
+        {checked: openIn == openInEnum.NEW_WINDOW});
+  });
+}
+
+function logLastError() {
+  if (chrome.runtime.lastError) {
+    console.error('Resurrect error:', chrome.runtime.lastError);
+  }
+}
+
+function genIaUrl(url) {
+  let dateStr = (new Date()).toISOString().replace(/-|T|:|\..*/g, '');
+  return 'https://web.archive.org/web/'+dateStr+'/'+url;
+}
+
+function genIaListUrl(url) {
+  let dateStr = (new Date()).toISOString().replace(/-|T|:|\..*/g, '');
+  return 'https://web.archive.org/web/*/'+url;
+}
+
+function genArchiveIsUrl(url) {
+  return 'https://archive.is/'+url;
+}
+
+function genWebCiteUrl(url) {
+  return 'http://webcitation.org/query.php?url='+encodeURIComponent(url);
+}
+
+function processPageUrlEdgeCases(url) {
+  if (url.startsWith('file:') || url.startsWith('about:')) {
+    return null;
+  }
+
+  if (url.startsWith('about:reader?url=')) {
+    return decodeURIComponent(url.replace('about:reader?url=', ''));
+  }
+
+  return url;
+}
+
+function goToUrl(url, where, openerTabId) {
+  switch(Number(where)) {
+    case openInEnum.CURRENT_TAB:
+      chrome.tabs.update({'url': url});
+      break;
+    case openInEnum.NEW_TAB:
+      chrome.tabs.create({'url': url, openerTabId});
+      break;
+    case openInEnum.NEW_BGTAB:
+      chrome.tabs.create({'url': url, 'active': false, openerTabId});
+      break;
+    case openInEnum.NEW_WINDOW:
+      chrome.windows.create({'url': url});
+      break;
+  }
+}
+
+
 chrome.storage.local.get('openIn', item => {
+
   if (item.openIn) {
     openIn = item.openIn;
   }
